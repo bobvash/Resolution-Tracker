@@ -14,7 +14,6 @@ public class ResolutionCalendarWidget extends VerticalPanel {
 		// Create a grid
 	    Grid grid = new Grid(7, 7);
 	    grid.setBorderWidth(1);
-	    grid.setCellPadding(5);
 	    
 	    int dateTitleRow = 0;
 	    int firstWeekRow = 1;
@@ -38,11 +37,19 @@ public class ResolutionCalendarWidget extends VerticalPanel {
 	    startOfMonth.setDate(1);
 	    endOfMonth.setMonth(endOfMonth.getMonth()+1);
 	    endOfMonth.setDate(0);
+	    Date endOfLastMonth = (Date)startOfMonth.clone();
+	    endOfLastMonth.setDate(0);
+	    int preIndex = -endOfLastMonth.getDay();
 	    
 	    for (int row = firstWeekRow; row < numRows; row++) {
 	      for (int col = 0; col < numColumns; col++) { 
 	    	  if ((row > firstWeekRow || col >= startOfMonth.getDay()) && index <= endOfMonth.getDate())
 	    		  grid.setWidget(row, col, new ResolutionDayWidget(index++));
+	    	  else if (index == 1)
+	    		  grid.setWidget(row, col, new ResolutionShadowDayWidget(endOfLastMonth.getDate()+preIndex++));
+	    	  else 
+	    		  grid.setWidget(row, col, new ResolutionShadowDayWidget((index++)-endOfMonth.getDate()));
+	    		  
 	      }
 	    }
 	    
