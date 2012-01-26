@@ -3,9 +3,8 @@ package com.bobvash.resolutiontracker.client;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
- * The async counterpart of <code>GreetingService</code>.
+ * The client side stub for the RPC service.
  */
 public interface GreetingServiceAsync {
-	void greetServer(String input, AsyncCallback<String> callback)
-			throws IllegalArgumentException;
+	void greetServer(String name, AsyncCallback<String> callback);
 }

@@ -1,7 +1,5 @@
 package com.bobvash.resolutiontracker.client;
 
-import java.util.Date;
-
 import com.bobvash.resolutiontracker.shared.FieldVerifier;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -10,13 +8,10 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -35,7 +30,8 @@ public class ResolutionTracker implements EntryPoint {
 			+ "connection and try again.";
 
 	/**
-	 * Create a remote service proxy to talk to the server-side Greeting service.
+	 * Create a remote service proxy to talk to the server-side Greeting
+	 * service.
 	 */
 	private final GreetingServiceAsync greetingService = GWT
 			.create(GreetingService.class);
@@ -44,37 +40,37 @@ public class ResolutionTracker implements EntryPoint {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-		
-//		// Create a grid
-//	    Grid grid = new Grid(6, 7);
-//
-//	    // Add images to the grid
-//	    int numRows = grid.getRowCount();
-//	    int numColumns = grid.getColumnCount();
-//	    int index = 1;
-//	    Date startOfMonth = new Date();
-////	    startOfMonth.setMonth(6);
-//	    Date endOfMonth = (Date)startOfMonth.clone();
-//	    startOfMonth.setDate(1);
-//	    endOfMonth.setMonth(endOfMonth.getMonth()+1);
-//	    endOfMonth.setDate(0);
-//	    for (int row = 0; row < numRows; row++) {
-//	      for (int col = 0; col < numColumns; col++) { 
-//	    	  if ((row > 0 || col >= startOfMonth.getDay()) && index <= endOfMonth.getDate())
-//	    		  grid.setWidget(row, col, new Label(""+index++));
-//	      }
-//	    }
 
-//		final TextBox debugBox = new TextBox();
-//		debugBox.setText(startOfMonth.toGMTString() + " " + endOfMonth.toGMTString());
-		
-	    // Return the panel
-//		RootPanel.get("debugTextContainer").add(debugBox);
-//		RootPanel.get("gridContainer").add(grid);
+		// // Create a grid
+		// Grid grid = new Grid(6, 7);
+		//
+		// // Add images to the grid
+		// int numRows = grid.getRowCount();
+		// int numColumns = grid.getColumnCount();
+		// int index = 1;
+		// Date startOfMonth = new Date();
+		// // startOfMonth.setMonth(6);
+		// Date endOfMonth = (Date)startOfMonth.clone();
+		// startOfMonth.setDate(1);
+		// endOfMonth.setMonth(endOfMonth.getMonth()+1);
+		// endOfMonth.setDate(0);
+		// for (int row = 0; row < numRows; row++) {
+		// for (int col = 0; col < numColumns; col++) {
+		// if ((row > 0 || col >= startOfMonth.getDay()) && index <=
+		// endOfMonth.getDate())
+		// grid.setWidget(row, col, new Label(""+index++));
+		// }
+		// }
+
+		// final TextBox debugBox = new TextBox();
+		// debugBox.setText(startOfMonth.toGMTString() + " " +
+		// endOfMonth.toGMTString());
+
+		// Return the panel
+		// RootPanel.get("debugTextContainer").add(debugBox);
+		// RootPanel.get("gridContainer").add(grid);
 		RootPanel.get("gridContainer").add(new ResolutionCalendarWidget());
-	  
-	    
-		
+
 		final Button sendButton = new Button("Send");
 		final TextBox nameField = new TextBox();
 		nameField.setText("GWT User");
@@ -140,7 +136,8 @@ public class ResolutionTracker implements EntryPoint {
 			}
 
 			/**
-			 * Send the name from the nameField to the server and wait for a response.
+			 * Send the name from the nameField to the server and wait for a
+			 * response.
 			 */
 			private void sendNameToServer() {
 				// First, we validate the input.
