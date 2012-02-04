@@ -7,9 +7,13 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("taskmanagement")
 public interface TaskManagementService extends RemoteService {
-	public TasksClientView getTasksForDate(Date date);
+	public TaskListClientView getTasksForDate(Date date);
 
-	public void addTaskForDate(Date date, String task);
-	
-	public void removeTaskForDate(Date date, String task);
+	public void saveTaskList(TaskListClientView taskList);
+
+	public void updateTaskStatus(TaskListClientView taskList, SingleTaskClientView task, boolean isComplete);
+
+	public void addTaskToList(TaskListClientView taskList, SingleTaskClientView newTask);
+
+	public void removeFromTasklist(TaskListClientView taskList,	SingleTaskClientView newTask);
 }
