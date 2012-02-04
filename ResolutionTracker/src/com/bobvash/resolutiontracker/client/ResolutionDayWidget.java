@@ -135,10 +135,13 @@ public class ResolutionDayWidget extends VerticalPanel {
 							tasksHolderPanel.remove(tasksHolderPanel.getWidget(0));
 						
 						loadedTaskList.clear();
-						loadedTaskList.add(result);
-						for (final TaskListClientView taskList: loadedTaskList)
-							for (final SingleTaskClientView task : taskList.getTasks()) {
-								createNewTaskWidget(taskList, task);
+						if (result != null) 
+						{
+							loadedTaskList.add(result);
+							for (final TaskListClientView taskList: loadedTaskList)
+								for (final SingleTaskClientView task : taskList.getTasks()) {
+									createNewTaskWidget(taskList, task);
+							}
 						}
 					}
 				});

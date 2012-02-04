@@ -29,7 +29,7 @@ public class TaskManagementServiceImpl extends RemoteServiceServlet implements
 			
 			List<DateBoundTasks> tasks = (List<DateBoundTasks>) q.execute(key);
 			if (tasks.size() == 0 || tasks.get(0).getTaskDescription().length == 0)
-				return new TaskListClientView(date, new SingleTaskClientView[] {});
+				return null;//new TaskListClientView(date, new SingleTaskClientView[] {});
 			
 			DateBoundTasks taskInPersistantView = tasks.get(0);
 			SingleTaskClientView[] clientTasks = new SingleTaskClientView[taskInPersistantView.getTaskDescription().length];
