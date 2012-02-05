@@ -10,6 +10,10 @@ public interface TaskManagementServiceAsync {
 	public void saveTaskList(TaskListClientView taskList, AsyncCallback<Void> callback);
 
 	public void updateTaskStatus(TaskListClientView taskList, SingleTaskClientView task, boolean isComplete, AsyncCallback<Void> callback);
+	
+	public void updateTaskTitle(TaskListClientView taskList, SingleTaskClientView task, String newTitle, AsyncCallback<Void> callback);
+	
+	public void updateTaskDescription(TaskListClientView taskList, SingleTaskClientView task, String description, AsyncCallback<Void> callback);
 
 	public void addTaskToList(TaskListClientView taskList, SingleTaskClientView newTask, AsyncCallback<Void> callback);
 

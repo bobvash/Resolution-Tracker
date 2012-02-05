@@ -13,6 +13,10 @@ public interface TaskManagementService extends RemoteService {
 
 	public void updateTaskStatus(TaskListClientView taskList, SingleTaskClientView task, boolean isComplete);
 
+	public void updateTaskTitle(TaskListClientView taskList, SingleTaskClientView task, String newTitle);
+	
+	public void updateTaskDescription(TaskListClientView taskList, SingleTaskClientView task, String newDescription);
+
 	public void addTaskToList(TaskListClientView taskList, SingleTaskClientView newTask);
 
 	public void removeFromTasklist(TaskListClientView taskList,	SingleTaskClientView newTask);

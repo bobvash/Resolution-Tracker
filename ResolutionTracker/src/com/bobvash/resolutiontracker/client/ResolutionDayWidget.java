@@ -7,16 +7,23 @@ import java.util.List;
 import org.apache.tools.ant.taskdefs.Taskdef;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.VerticalAlign;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DecoratedPopupPanel;
+import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PushButton;
+import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -30,7 +37,7 @@ public class ResolutionDayWidget extends VerticalPanel {
 
 	public ResolutionDayWidget(final Date date) {
 		this.date = date;
-		this.setSize("100px", "100px");
+		this.setSize("150px", "100px");
 		this.setSpacing(5);
 
 		HorizontalPanel headerHolderPanel = new HorizontalPanel();
@@ -42,13 +49,14 @@ public class ResolutionDayWidget extends VerticalPanel {
 		newTaskButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				final String newTaskTitle = Window.prompt(
+						"What will the new task be titled?", "");
 				final String newTaskDescription = Window.prompt(
-						"What will the new task be?", "");
-				if (newTaskDescription.length() > 0) //TODO NOT ASSUME FIRST
+						"What will be the description?", "");
+				if (newTaskTitle.length() > 0) //TODO NOT ASSUME FIRST
 				{
-					TaskListClientView taskListToAddTo;
 					if (loadedTaskList.size() > 0) {
-						taskManagementService.addTaskToList(loadedTaskList.get(0), new SingleTaskClientView(newTaskDescription, false), 
+						taskManagementService.addTaskToList(loadedTaskList.get(0), new SingleTaskClientView(newTaskTitle, newTaskDescription, false), 
 							new AsyncCallback<Void>() {
 
 								@Override
@@ -64,7 +72,7 @@ public class ResolutionDayWidget extends VerticalPanel {
 
 					}
 					else {
-						taskManagementService.saveTaskList( new TaskListClientView(date, new SingleTaskClientView[]{new SingleTaskClientView(newTaskDescription, false)}),  
+						taskManagementService.saveTaskList( new TaskListClientView(date, new SingleTaskClientView[]{new SingleTaskClientView(newTaskTitle, newTaskDescription, false)}),  
 								new AsyncCallback<Void>() {
 
 									@Override
@@ -85,33 +93,6 @@ public class ResolutionDayWidget extends VerticalPanel {
 		newTaskButton.setHeight("20px");
 		newTaskButton.setStyleName("dayWidgetOutOfRange");
 		headerHolderPanel.add(newTaskButton);
-		
-		Button removeTaskButtion = new Button("-");
-		removeTaskButtion.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				final String taskDescription = Window.prompt(
-						"Which task to remove?", "");
-				if (taskDescription.length() > 0)  //TODO GET ACTUAL INSTANCE OF SINGLETAKSCLIENTVIEW OBJECT
-					if (loadedTaskList.size() > 0)
-						taskManagementService.removeFromTasklist(loadedTaskList.get(0), new SingleTaskClientView(taskDescription, false),
-							new AsyncCallback<Void>() {
-
-								@Override
-								public void onFailure(Throwable error) {
-									Window.alert("Removal of task failed: " + error.getMessage());
-								}
-
-								@Override
-								public void onSuccess(Void ignore) {
-									loadTasksForDay();
-								}
-							});
-			}
-		});
-		removeTaskButtion.setHeight("20px");
-		removeTaskButtion.setStyleName("dayWidgetOutOfRange");
-		headerHolderPanel.add(removeTaskButtion);
 
 		this.add(headerHolderPanel);
 		loadTasksForDay();
@@ -148,31 +129,25 @@ public class ResolutionDayWidget extends VerticalPanel {
 	}
 	
 	private void createNewTaskWidget(final TaskListClientView currentTaskList, final SingleTaskClientView task) {
-		final int maxButtonTextLength = 8;
-		final DecoratedPopupPanel simplePopup = new DecoratedPopupPanel(true);
-	    simplePopup.ensureDebugId("cwBasicPopup-simplePopup");
-	    simplePopup.setWidth("150px");
-        simplePopup.setWidget(new Label(task.getDescription()));
+	    final DialogBox dialogBox = createDialogBox(currentTaskList, task);
+	    dialogBox.setGlassEnabled(true);
+	    dialogBox.setAnimationEnabled(true);
 	    
 		HorizontalPanel taskRowPanel = new HorizontalPanel();
 
 		Button taskButton = new Button("SUP SUP", new ClickHandler() {
 		        public void onClick(ClickEvent event) {
-		          // Reposition the popup relative to the button
-		          Widget source = (Widget) event.getSource();
-		          int left = source.getAbsoluteLeft() + 10;
-		          int top = source.getAbsoluteTop() + 10;
-		          simplePopup.setPopupPosition(left, top);
 
-		          // Show the popup
-		          simplePopup.show();
+			          Widget source = (Widget) event.getSource();
+			          int left = source.getAbsoluteLeft() + 10;
+			          int top = source.getAbsoluteTop() + 10;
+			          dialogBox.setPopupPosition(left, top);
+			          dialogBox.show();
 		        }
 		      });
-		if (task.getDescription().length() < maxButtonTextLength)
-			taskButton.setText(task.getDescription());
-		else
-			taskButton.setText(task.getDescription().substring(0, maxButtonTextLength));
-		taskButton.setWidth("80px");
+		
+		taskButton.setText(task.getTitle());
+		taskButton.setWidth("130px");
 		taskRowPanel.add(taskButton);
 
 		final PushButton taskStatusCompleteButton = new PushButton(new Image(
@@ -229,5 +204,117 @@ public class ResolutionDayWidget extends VerticalPanel {
 
 		tasksHolderPanel.add(taskRowPanel);
 		
+	}
+
+	private DialogBox createDialogBox(final TaskListClientView currentTaskList, final SingleTaskClientView task) {
+		// Create a dialog box and set the caption text
+	    final DialogBox dialogBox = new DialogBox();
+	    dialogBox.ensureDebugId("cwDialogBox");
+	    dialogBox.setText(task.getTitle());
+
+	    // Create a table to layout the content
+	    VerticalPanel dialogContents = new VerticalPanel();
+	    dialogContents.setSize("300px", "200px");
+	    dialogContents.setSpacing(4);
+	    dialogBox.setWidget(dialogContents);
+
+	    Label titleLabel = new Label("Title: ");
+	    dialogContents.add(titleLabel);
+	    
+	    final TextBox titleEditTextBox = new TextBox();
+	    titleEditTextBox.setTitle("Title");
+	    titleEditTextBox.setText(task.getTitle());
+	    titleEditTextBox.setWidth("280px");
+	    dialogContents.add(titleEditTextBox);
+	    
+	    Label descriptionLabel = new Label("Description: ");
+	    dialogContents.add(descriptionLabel);
+	    
+	    final TextArea descriptionEditTextArea = new TextArea();
+	    descriptionEditTextArea.setTitle("Description");
+	    descriptionEditTextArea.setText(task.getDescription());
+	    descriptionEditTextArea.setWidth("280px");
+	    dialogContents.add(descriptionEditTextArea);
+	    
+	    HorizontalPanel bottomContainer = new HorizontalPanel();
+	    bottomContainer.setWidth("100%");
+
+	    Button saveButton = new Button(
+	        "Save", new ClickHandler() {
+	          public void onClick(ClickEvent event) {
+	        	  if (!titleEditTextBox.getText().equals(task.getTitle()))
+					taskManagementService.updateTaskTitle(currentTaskList, task, titleEditTextBox.getText(),
+							new AsyncCallback<Void>() {
+
+								@Override
+								public void onFailure(Throwable error) {
+									Window.alert("Update of task title failed: " + error.getMessage());
+								}
+
+								@Override
+								public void onSuccess(Void ignore) {
+									loadTasksForDay();
+								}
+							});
+	        	  if (!descriptionEditTextArea.getText().equals(task.getDescription()))
+						taskManagementService.updateTaskDescription(currentTaskList, task, descriptionEditTextArea.getText(),
+								new AsyncCallback<Void>() {
+
+									@Override
+									public void onFailure(Throwable error) {
+										Window.alert("Update of task description failed: " + error.getMessage());
+									}
+
+									@Override
+									public void onSuccess(Void ignore) {
+										loadTasksForDay();
+									}
+								});
+	          }
+	        });
+	    bottomContainer.add(saveButton);
+	    bottomContainer.setCellHorizontalAlignment(saveButton, HasHorizontalAlignment.ALIGN_LEFT);
+	    
+	    // Add a delete button at the bottom of the dialog
+	    Button deleteButton = new Button(
+	        "Delete", new ClickHandler() {
+	          public void onClick(ClickEvent event) {
+	        	 Boolean confirm = Window.confirm("Are you sure you want to delete this task?");
+	        	 if (confirm) {
+						taskManagementService.removeFromTasklist(currentTaskList, task,
+								new AsyncCallback<Void>() {
+	
+									@Override
+									public void onFailure(Throwable error) {
+										Window.alert("Removal of task failed: " + error.getMessage());
+									}
+	
+									@Override
+									public void onSuccess(Void ignore) {
+						        		dialogBox.hide();
+										loadTasksForDay();
+									}
+								});
+	        	 }
+	          }
+	        });
+	    bottomContainer.add(deleteButton);
+	    bottomContainer.setCellHorizontalAlignment(deleteButton, HasHorizontalAlignment.ALIGN_CENTER);
+
+	    // Add a close button at the bottom of the dialog
+	    Button closeButton = new Button(
+	        "Close", new ClickHandler() {
+	          public void onClick(ClickEvent event) {
+	            dialogBox.hide();
+	          }
+	        });
+	    bottomContainer.add(closeButton);
+	    bottomContainer.setCellHorizontalAlignment(closeButton, HasHorizontalAlignment.ALIGN_RIGHT);
+
+	    dialogContents.add(bottomContainer);
+	    dialogContents.setCellVerticalAlignment(bottomContainer, HasVerticalAlignment.ALIGN_BOTTOM);
+	    
+	    // Return the dialog box
+	    return dialogBox;
 	}
 }

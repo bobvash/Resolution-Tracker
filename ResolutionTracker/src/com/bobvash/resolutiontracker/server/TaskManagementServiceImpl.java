@@ -28,13 +28,15 @@ public class TaskManagementServiceImpl extends RemoteServiceServlet implements
 			String key = ResolutionUtils.convertDateToKey(date);
 			
 			List<DateBoundTasks> tasks = (List<DateBoundTasks>) q.execute(key);
-			if (tasks.size() == 0 || tasks.get(0).getTaskDescription().length == 0)
-				return null;//new TaskListClientView(date, new SingleTaskClientView[] {});
+			if (tasks.size() == 0 || tasks.get(0).getTaskTitle().length == 0)
+				return null;
 			
 			DateBoundTasks taskInPersistantView = tasks.get(0);
-			SingleTaskClientView[] clientTasks = new SingleTaskClientView[taskInPersistantView.getTaskDescription().length];
-			for (int i=0; i<taskInPersistantView.getTaskDescription().length; i++)
-					clientTasks[i] = new SingleTaskClientView(taskInPersistantView.getTaskDescription()[i], taskInPersistantView.getIsComplete()[i]);
+						
+			SingleTaskClientView[] clientTasks = new SingleTaskClientView[taskInPersistantView.getTaskTitle().length];
+			for (int i=0; i<taskInPersistantView.getTaskTitle().length; i++)  {
+				clientTasks[i] = new SingleTaskClientView(taskInPersistantView.getTaskTitle()[i], taskInPersistantView.getTaskDescription()[i], taskInPersistantView.getIsComplete()[i]);
+			}
 			result = new TaskListClientView(date, clientTasks);
 
 		} finally {
@@ -52,13 +54,15 @@ public class TaskManagementServiceImpl extends RemoteServiceServlet implements
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			String[] tasks = new String[taskList.getTasks().length];
+			String[] taskdescriptions = new String[taskList.getTasks().length];
 			Boolean[] completeness = new Boolean[taskList.getTasks().length];
 			for (int i=0; i<taskList.getTasks().length; i++)
 			{
-				tasks[i] = taskList.getTasks()[i].getDescription();
+				tasks[i] = taskList.getTasks()[i].getTitle();
+				taskdescriptions[i] = taskList.getTasks()[i].getDescription();
 				completeness[i] = taskList.getTasks()[i].isCompleted();
 			}
-			DateBoundTasks saveTask = new DateBoundTasks(taskList.getDate(), tasks, completeness);
+			DateBoundTasks saveTask = new DateBoundTasks(taskList.getDate(), tasks, taskdescriptions, completeness);
 			
 			pm.makePersistent(saveTask);
 		} finally {
@@ -82,7 +86,59 @@ public class TaskManagementServiceImpl extends RemoteServiceServlet implements
 				
 				DateBoundTasks detachedResult = pm.detachCopy(result);
 				pm.deletePersistent(result);
-				detachedResult.updateTask(task.getDescription(), isComplete);
+				detachedResult.updateTaskStatus(task.getTitle(), isComplete);
+				pm.makePersistent(detachedResult);
+			}
+			
+		} finally {
+			pm.close();
+		}
+		
+	}
+
+	@Override
+	public void updateTaskTitle(TaskListClientView taskList,
+			SingleTaskClientView task, String newTitle) {
+
+		PersistenceManager pm = getPersistenceManager();
+		try {			
+			DateBoundTasks result = null;
+			Query q = pm.newQuery(DateBoundTasks.class, "dateString == ds");
+			q.declareParameters("java.lang.String ds");
+
+			List<DateBoundTasks> tasks = (List<DateBoundTasks>) q.execute(ResolutionUtils.convertDateToKey(taskList.getDate()));
+			if (tasks.size() != 0) {
+				result = tasks.get(0);
+				
+				DateBoundTasks detachedResult = pm.detachCopy(result);
+				pm.deletePersistent(result);
+				detachedResult.updateTaskTitle(task.getTitle(), newTitle);
+				pm.makePersistent(detachedResult);
+			}
+			
+		} finally {
+			pm.close();
+		}
+		
+	}
+	
+	@Override
+	public void updateTaskDescription(TaskListClientView taskList,
+			SingleTaskClientView task, String description) {
+
+		PersistenceManager pm = getPersistenceManager();
+		try {			
+			DateBoundTasks result = null;
+			Query q = pm.newQuery(DateBoundTasks.class, "dateString == ds");
+			q.declareParameters("java.lang.String ds");
+
+			List<DateBoundTasks> tasks = (List<DateBoundTasks>) q.execute(ResolutionUtils.convertDateToKey(taskList.getDate()));
+			if (tasks.size() != 0) {
+				result = tasks.get(0);
+				
+				DateBoundTasks detachedResult = pm.detachCopy(result);
+				pm.deletePersistent(result);
+				detachedResult.updateTaskDescription(task.getTitle(), description);
 				pm.makePersistent(detachedResult);
 			}
 			
@@ -108,7 +164,7 @@ public class TaskManagementServiceImpl extends RemoteServiceServlet implements
 				
 				DateBoundTasks detachedResult = pm.detachCopy(result);
 				pm.deletePersistent(result);
-				detachedResult.addTask(newTask.getDescription(), newTask.isCompleted());
+				detachedResult.addTask(newTask.getTitle(), newTask.getDescription(), newTask.isCompleted());
 				pm.makePersistent(detachedResult);
 			}
 			
@@ -134,7 +190,7 @@ public class TaskManagementServiceImpl extends RemoteServiceServlet implements
 				
 				DateBoundTasks detachedResult = pm.detachCopy(result);
 				pm.deletePersistent(result);
-				detachedResult.removeTask(newTask.getDescription());
+				detachedResult.removeTask(newTask.getTitle());
 				pm.makePersistent(detachedResult);
 			}
 			
