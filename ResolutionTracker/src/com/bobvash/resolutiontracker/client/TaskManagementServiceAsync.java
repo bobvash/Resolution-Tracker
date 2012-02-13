@@ -14,6 +14,8 @@ public interface TaskManagementServiceAsync {
 	public void updateTaskTitle(TaskListClientView taskList, SingleTaskClientView task, String newTitle, AsyncCallback<Void> callback);
 	
 	public void updateTaskDescription(TaskListClientView taskList, SingleTaskClientView task, String description, AsyncCallback<Void> callback);
+	
+	public void updateTaskOwner(TaskListClientView taskList, SingleTaskClientView task, String newOwner, AsyncCallback<Void> callback);
 
 	public void addTaskToList(TaskListClientView taskList, SingleTaskClientView newTask, AsyncCallback<Void> callback);
 

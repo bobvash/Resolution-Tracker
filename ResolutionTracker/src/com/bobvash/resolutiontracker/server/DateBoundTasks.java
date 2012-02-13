@@ -25,14 +25,18 @@ public class DateBoundTasks {
 	private String[] taskDescription;
 
 	@Persistent
+	private String[] taskOwner;
+
+	@Persistent
 	private Boolean[] isComplete;
 
 	public DateBoundTasks(Date date, String[] taskTitle,
-			String[] taskDescription, Boolean[] isComplete) {
+			String[] taskDescription, String[] taskOwner, Boolean[] isComplete) {
 		this.dateString = ResolutionUtils.convertDateToKey(date);
 		this.date = date;
 		this.taskTitle = taskTitle;
 		this.taskDescription = taskDescription;
+		this.taskOwner = taskOwner;
 		this.isComplete = isComplete;
 	}
 
@@ -76,28 +80,44 @@ public class DateBoundTasks {
 		this.taskTitle = taskTitle;
 	}
 
-	public void addTask(String newTaskTitle, String newTaskDescription, Boolean isComplete) {
+	public String[] getTaskOwner() {
+		return taskOwner;
+	}
 
-		Boolean[] newTaskTitles = new Boolean[this.isComplete.length + 1];
+	public void setTaskOwner(String[] taskOwner) {
+		this.taskOwner = taskOwner;
+	}
+
+	public void addTask(String newTaskTitle, String newTaskDescription,
+			String owner, Boolean isComplete) {
+
+		String[] newTaskTitles = new String[this.isComplete.length + 1];
 		for (int i = 0; i < this.isComplete.length; i++) {
-			newTaskTitles[i] = this.isComplete[i];
+			newTaskTitles[i] = this.taskTitle[i];
 		}
-		newTaskTitles[newTaskTitles.length - 1] = isComplete;
-		this.isComplete = newTaskTitles;
-		
+		newTaskTitles[newTaskTitles.length - 1] = newTaskTitle;
+		this.taskTitle = newTaskTitles;
+
 		String[] newTasksDesc = new String[this.taskDescription.length + 1];
 		for (int i = 0; i < this.taskDescription.length; i++) {
 			newTasksDesc[i] = this.taskDescription[i];
 		}
 		newTasksDesc[newTasksDesc.length - 1] = newTaskDescription;
 		this.taskDescription = newTasksDesc;
-		
+
 		Boolean[] newTaskIsComplete = new Boolean[this.isComplete.length + 1];
 		for (int i = 0; i < this.isComplete.length; i++) {
 			newTaskIsComplete[i] = this.isComplete[i];
 		}
 		newTaskIsComplete[newTaskIsComplete.length - 1] = isComplete;
 		this.isComplete = newTaskIsComplete;
+
+		String[] newTaskOwner = new String[this.taskOwner.length + 1];
+		for (int i = 0; i < this.taskOwner.length; i++) {
+			newTaskOwner[i] = this.taskOwner[i];
+		}
+		newTaskOwner[newTaskOwner.length - 1] = owner;
+		this.taskOwner = newTaskOwner;
 	}
 
 	public void removeTask(String newTaskTitle) {
@@ -117,7 +137,7 @@ public class DateBoundTasks {
 				newTasks[i - 1] = this.taskTitle[i];
 		}
 		this.taskTitle = newTasks;
-		
+
 		String[] newTaskDescriptions = new String[this.taskDescription.length - 1];
 		for (int i = 0; i < this.taskDescription.length; i++) {
 			if (i < removeAtIndex)
@@ -135,28 +155,45 @@ public class DateBoundTasks {
 				newTaskIsComplete[i - 1] = this.isComplete[i];
 		}
 		this.isComplete = newTaskIsComplete;
+		
+		String[] newTaskOwners = new String[this.taskOwner.length - 1];
+		for (int i = 0; i < this.taskOwner.length; i++) {
+			if (i < removeAtIndex)
+				newTaskOwners[i] = this.taskOwner[i];
+			else if (i > removeAtIndex)
+				newTaskOwners[i - 1] = this.taskOwner[i];
+		}
+		this.taskOwner = newTaskOwners;
 	}
 
-	public void updateTaskStatus(String task, Boolean isComplete) {
+	public void updateTaskStatus(String forTaskTitle, Boolean isComplete) {
 		for (int i = 0; i < this.taskTitle.length; i++) {
-			if (this.taskTitle[i].equals(task)) {
+			if (this.taskTitle[i].equals(forTaskTitle)) {
 				this.isComplete[i] = isComplete;
 			}
 		}
 	}
 
-	public void updateTaskDescription(String task, String description) {
+	public void updateTaskDescription(String forTaskTitle, String description) {
 		for (int i = 0; i < this.taskTitle.length; i++) {
-			if (this.taskTitle[i].equals(task)) {
+			if (this.taskTitle[i].equals(forTaskTitle)) {
 				this.taskDescription[i] = description;
 			}
 		}
 	}
-	
-	public void updateTaskTitle(String task, String newTitle) {
+
+	public void updateTaskTitle(String forTaskTitle, String newTitle) {
 		for (int i = 0; i < this.taskTitle.length; i++) {
-			if (this.taskTitle[i].equals(task)) {
+			if (this.taskTitle[i].equals(forTaskTitle)) {
 				this.taskTitle[i] = newTitle;
+			}
+		}
+	}
+	
+	public void updateTaskOwner(String forTaskTitle, String newOwner) {
+		for (int i = 0; i < this.taskOwner.length; i++) {
+			if (this.taskTitle[i].equals(forTaskTitle)) {
+				this.taskOwner[i] = newOwner;
 			}
 		}
 	}

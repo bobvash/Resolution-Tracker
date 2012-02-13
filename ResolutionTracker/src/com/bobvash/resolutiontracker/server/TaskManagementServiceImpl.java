@@ -32,13 +32,25 @@ public class TaskManagementServiceImpl extends RemoteServiceServlet implements
 				return null;
 			
 			DateBoundTasks taskInPersistantView = tasks.get(0);
-						
-			SingleTaskClientView[] clientTasks = new SingleTaskClientView[taskInPersistantView.getTaskTitle().length];
-			for (int i=0; i<taskInPersistantView.getTaskTitle().length; i++)  {
-				clientTasks[i] = new SingleTaskClientView(taskInPersistantView.getTaskTitle()[i], taskInPersistantView.getTaskDescription()[i], taskInPersistantView.getIsComplete()[i]);
-			}
+
+			int taskListLength = Math.max(Math.max(
+					taskInPersistantView.getTaskDescription().length,
+					taskInPersistantView.getTaskTitle().length), Math.max(
+					taskInPersistantView.getIsComplete().length,
+					taskInPersistantView.getTaskOwner().length));
+
+			SingleTaskClientView[] clientTasks = new SingleTaskClientView[taskListLength];
+				for (int i=0; i<taskListLength; i++)  {
+						clientTasks[i] = new SingleTaskClientView(
+								taskInPersistantView.getTaskTitle().length > i ? taskInPersistantView.getTaskTitle()[i] : ("TITLE MISSING # " + i), 
+								taskInPersistantView.getTaskDescription().length > i ? taskInPersistantView.getTaskDescription()[i] : "none", 
+								taskInPersistantView.getTaskOwner().length > i ? taskInPersistantView.getTaskOwner()[i] : "Bobby", 
+								taskInPersistantView.getIsComplete().length > i ? taskInPersistantView.getIsComplete()[i] : false);
+				}
 			result = new TaskListClientView(date, clientTasks);
 
+			//To restore data integrity, re-save loaded list with the defaults applied
+			saveTaskList(result);
 		} finally {
 			pm.close();
 		}
@@ -55,14 +67,16 @@ public class TaskManagementServiceImpl extends RemoteServiceServlet implements
 		try {
 			String[] tasks = new String[taskList.getTasks().length];
 			String[] taskdescriptions = new String[taskList.getTasks().length];
+			String[] owners = new String[taskList.getTasks().length];
 			Boolean[] completeness = new Boolean[taskList.getTasks().length];
 			for (int i=0; i<taskList.getTasks().length; i++)
 			{
 				tasks[i] = taskList.getTasks()[i].getTitle();
 				taskdescriptions[i] = taskList.getTasks()[i].getDescription();
+				owners[i] = taskList.getTasks()[i].getOwner();
 				completeness[i] = taskList.getTasks()[i].isCompleted();
 			}
-			DateBoundTasks saveTask = new DateBoundTasks(taskList.getDate(), tasks, taskdescriptions, completeness);
+			DateBoundTasks saveTask = new DateBoundTasks(taskList.getDate(), tasks, taskdescriptions, owners, completeness);
 			
 			pm.makePersistent(saveTask);
 		} finally {
@@ -149,6 +163,32 @@ public class TaskManagementServiceImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
+	public void updateTaskOwner(TaskListClientView taskList,
+			SingleTaskClientView task, String newOwner) {
+
+		PersistenceManager pm = getPersistenceManager();
+		try {			
+			DateBoundTasks result = null;
+			Query q = pm.newQuery(DateBoundTasks.class, "dateString == ds");
+			q.declareParameters("java.lang.String ds");
+
+			List<DateBoundTasks> tasks = (List<DateBoundTasks>) q.execute(ResolutionUtils.convertDateToKey(taskList.getDate()));
+			if (tasks.size() != 0) {
+				result = tasks.get(0);
+				
+				DateBoundTasks detachedResult = pm.detachCopy(result);
+				pm.deletePersistent(result);
+				detachedResult.updateTaskOwner(task.getTitle(), newOwner);
+				pm.makePersistent(detachedResult);
+			}
+			
+		} finally {
+			pm.close();
+		}
+		
+	}
+
+	@Override
 	public void addTaskToList(TaskListClientView taskList,
 			SingleTaskClientView newTask) {
 		
@@ -164,7 +204,7 @@ public class TaskManagementServiceImpl extends RemoteServiceServlet implements
 				
 				DateBoundTasks detachedResult = pm.detachCopy(result);
 				pm.deletePersistent(result);
-				detachedResult.addTask(newTask.getTitle(), newTask.getDescription(), newTask.isCompleted());
+				detachedResult.addTask(newTask.getTitle(), newTask.getDescription(), newTask.getOwner(), newTask.isCompleted());
 				pm.makePersistent(detachedResult);
 			}
 			

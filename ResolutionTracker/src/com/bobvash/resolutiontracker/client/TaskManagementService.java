@@ -16,6 +16,8 @@ public interface TaskManagementService extends RemoteService {
 	public void updateTaskTitle(TaskListClientView taskList, SingleTaskClientView task, String newTitle);
 	
 	public void updateTaskDescription(TaskListClientView taskList, SingleTaskClientView task, String newDescription);
+	
+	public void updateTaskOwner(TaskListClientView taskList, SingleTaskClientView task, String newOwner);
 
 	public void addTaskToList(TaskListClientView taskList, SingleTaskClientView newTask);
 

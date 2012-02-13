@@ -42,7 +42,7 @@ public class ResolutionCalendarWidget extends VerticalPanel {
 			for (int col = 0; col < numColumns; col++) {
 				if (index.getMonth() == currentMonth)
 					grid.setWidget(row, col, new ResolutionDayWidget(
-							(Date) index.clone()));
+							(Date) index.clone(), row, col));
 				else
 					grid.setWidget(row, col, new ResolutionShadowDayWidget(
 							(Date) index.clone()));
