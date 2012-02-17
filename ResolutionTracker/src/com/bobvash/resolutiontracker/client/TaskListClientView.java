@@ -3,18 +3,17 @@ package com.bobvash.resolutiontracker.client;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.bobvash.resolutiontracker.server.ResolutionUtils;
 
 public class TaskListClientView implements Serializable {
-	private Date date;
 	private SingleTaskClientView[] tasks;
+	private String dateString;
 
 	public TaskListClientView() {
 
 	}
 
-	public TaskListClientView(Date date, SingleTaskClientView[] tasks) {
-		this.date = date;
+	public TaskListClientView(String dateString, SingleTaskClientView[] tasks) {
+		this.dateString = dateString;
 		this.tasks = tasks;
 	}
 
@@ -22,7 +21,7 @@ public class TaskListClientView implements Serializable {
 		return tasks;
 	}
 	
-	public Date getDate() {
-		return date;
+	public String getDateString() {
+		return dateString;
 	}
 }

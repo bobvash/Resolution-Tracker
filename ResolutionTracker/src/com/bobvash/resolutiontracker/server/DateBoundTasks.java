@@ -8,15 +8,14 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
+import com.bobvash.resolutiontracker.client.ResolutionUtils;
+
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
 public class DateBoundTasks {
 
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private String dateString;
-
-	@Persistent
-	private Date date;
 
 	@Persistent
 	private String[] taskTitle;
@@ -30,10 +29,9 @@ public class DateBoundTasks {
 	@Persistent
 	private Boolean[] isComplete;
 
-	public DateBoundTasks(Date date, String[] taskTitle,
+	public DateBoundTasks(String dateKey, String[] taskTitle,
 			String[] taskDescription, String[] taskOwner, Boolean[] isComplete) {
-		this.dateString = ResolutionUtils.convertDateToKey(date);
-		this.date = date;
+		this.dateString = dateKey;
 		this.taskTitle = taskTitle;
 		this.taskDescription = taskDescription;
 		this.taskOwner = taskOwner;
@@ -46,14 +44,6 @@ public class DateBoundTasks {
 
 	public String getDateString() {
 		return dateString;
-	}
-
-	public Date getDate() {
-		return date;
-	}
-
-	public void setDate(Date date) {
-		this.date = date;
 	}
 
 	public void setTaskDescription(String[] taskDescription) {

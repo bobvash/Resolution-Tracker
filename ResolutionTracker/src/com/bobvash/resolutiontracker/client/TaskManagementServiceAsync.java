@@ -5,7 +5,7 @@ import java.util.Date;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface TaskManagementServiceAsync {
-	public void getTasksForDate(Date date, AsyncCallback<TaskListClientView> callback);
+	public void getTasksForDate(String dateKey, AsyncCallback<TaskListClientView> callback);
 
 	public void saveTaskList(TaskListClientView taskList, AsyncCallback<Void> callback);
 

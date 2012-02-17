@@ -7,6 +7,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
 
+import com.bobvash.resolutiontracker.client.ResolutionUtils;
 import com.bobvash.resolutiontracker.client.SingleTaskClientView;
 import com.bobvash.resolutiontracker.client.TaskListClientView;
 import com.bobvash.resolutiontracker.client.TaskManagementService;
@@ -19,15 +20,14 @@ public class TaskManagementServiceImpl extends RemoteServiceServlet implements
 	private static final PersistenceManagerFactory PMF = PMFSingleton
 			.getInstance();
 
-	public TaskListClientView getTasksForDate(Date date) {
+	public TaskListClientView getTasksForDate(String dateKey) {
 		PersistenceManager pm = getPersistenceManager();
 		TaskListClientView result = null;
 		try {
 			Query q = pm.newQuery(DateBoundTasks.class, "dateString == ds");
 			q.declareParameters("java.lang.String ds");
-			String key = ResolutionUtils.convertDateToKey(date);
 			
-			List<DateBoundTasks> tasks = (List<DateBoundTasks>) q.execute(key);
+			List<DateBoundTasks> tasks = (List<DateBoundTasks>) q.execute(dateKey);
 			if (tasks.size() == 0 || tasks.get(0).getTaskTitle().length == 0)
 				return null;
 			
@@ -47,7 +47,7 @@ public class TaskManagementServiceImpl extends RemoteServiceServlet implements
 								taskInPersistantView.getTaskOwner().length > i ? taskInPersistantView.getTaskOwner()[i] : "Bobby", 
 								taskInPersistantView.getIsComplete().length > i ? taskInPersistantView.getIsComplete()[i] : false);
 				}
-			result = new TaskListClientView(date, clientTasks);
+			result = new TaskListClientView(dateKey, clientTasks);
 
 			//To restore data integrity, re-save loaded list with the defaults applied
 			saveTaskList(result);
@@ -76,7 +76,7 @@ public class TaskManagementServiceImpl extends RemoteServiceServlet implements
 				owners[i] = taskList.getTasks()[i].getOwner();
 				completeness[i] = taskList.getTasks()[i].isCompleted();
 			}
-			DateBoundTasks saveTask = new DateBoundTasks(taskList.getDate(), tasks, taskdescriptions, owners, completeness);
+			DateBoundTasks saveTask = new DateBoundTasks(taskList.getDateString(), tasks, taskdescriptions, owners, completeness);
 			
 			pm.makePersistent(saveTask);
 		} finally {
@@ -94,7 +94,7 @@ public class TaskManagementServiceImpl extends RemoteServiceServlet implements
 			Query q = pm.newQuery(DateBoundTasks.class, "dateString == ds");
 			q.declareParameters("java.lang.String ds");
 
-			List<DateBoundTasks> tasks = (List<DateBoundTasks>) q.execute(ResolutionUtils.convertDateToKey(taskList.getDate()));
+			List<DateBoundTasks> tasks = (List<DateBoundTasks>) q.execute(taskList.getDateString());
 			if (tasks.size() != 0) {
 				result = tasks.get(0);
 				
@@ -120,7 +120,7 @@ public class TaskManagementServiceImpl extends RemoteServiceServlet implements
 			Query q = pm.newQuery(DateBoundTasks.class, "dateString == ds");
 			q.declareParameters("java.lang.String ds");
 
-			List<DateBoundTasks> tasks = (List<DateBoundTasks>) q.execute(ResolutionUtils.convertDateToKey(taskList.getDate()));
+			List<DateBoundTasks> tasks = (List<DateBoundTasks>) q.execute(taskList.getDateString());
 			if (tasks.size() != 0) {
 				result = tasks.get(0);
 				
@@ -146,7 +146,7 @@ public class TaskManagementServiceImpl extends RemoteServiceServlet implements
 			Query q = pm.newQuery(DateBoundTasks.class, "dateString == ds");
 			q.declareParameters("java.lang.String ds");
 
-			List<DateBoundTasks> tasks = (List<DateBoundTasks>) q.execute(ResolutionUtils.convertDateToKey(taskList.getDate()));
+			List<DateBoundTasks> tasks = (List<DateBoundTasks>) q.execute(taskList.getDateString());
 			if (tasks.size() != 0) {
 				result = tasks.get(0);
 				
@@ -172,7 +172,7 @@ public class TaskManagementServiceImpl extends RemoteServiceServlet implements
 			Query q = pm.newQuery(DateBoundTasks.class, "dateString == ds");
 			q.declareParameters("java.lang.String ds");
 
-			List<DateBoundTasks> tasks = (List<DateBoundTasks>) q.execute(ResolutionUtils.convertDateToKey(taskList.getDate()));
+			List<DateBoundTasks> tasks = (List<DateBoundTasks>) q.execute(taskList.getDateString());
 			if (tasks.size() != 0) {
 				result = tasks.get(0);
 				
@@ -198,7 +198,7 @@ public class TaskManagementServiceImpl extends RemoteServiceServlet implements
 			Query q = pm.newQuery(DateBoundTasks.class, "dateString == ds");
 			q.declareParameters("java.lang.String ds");
 
-			List<DateBoundTasks> tasks = (List<DateBoundTasks>) q.execute(ResolutionUtils.convertDateToKey(taskList.getDate()));
+			List<DateBoundTasks> tasks = (List<DateBoundTasks>) q.execute(taskList.getDateString());
 			if (tasks.size() != 0) {
 				result = tasks.get(0);
 				
@@ -224,7 +224,7 @@ public class TaskManagementServiceImpl extends RemoteServiceServlet implements
 			Query q = pm.newQuery(DateBoundTasks.class, "dateString == ds");
 			q.declareParameters("java.lang.String ds");
 
-			List<DateBoundTasks> tasks = (List<DateBoundTasks>) q.execute(ResolutionUtils.convertDateToKey(taskList.getDate()));
+			List<DateBoundTasks> tasks = (List<DateBoundTasks>) q.execute(taskList.getDateString());
 			if (tasks.size() != 0) {
 				result = tasks.get(0);
 				

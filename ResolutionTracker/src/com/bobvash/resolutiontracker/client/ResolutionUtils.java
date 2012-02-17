@@ -1,4 +1,4 @@
-package com.bobvash.resolutiontracker.server;
+package com.bobvash.resolutiontracker.client;
 
 import java.util.Date;
 

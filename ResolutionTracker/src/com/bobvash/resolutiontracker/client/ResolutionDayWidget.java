@@ -128,7 +128,7 @@ public class ResolutionDayWidget extends VerticalPanel {
 	}
 
 	private void loadTasksForDay() {
-		taskManagementService.getTasksForDate(date,
+		taskManagementService.getTasksForDate(ResolutionUtils.convertDateToKey(date),
 				new AsyncCallback<TaskListClientView>() {
 
 					@Override
@@ -464,7 +464,8 @@ public class ResolutionDayWidget extends VerticalPanel {
 
 						}
 						else {
-							taskManagementService.saveTaskList( new TaskListClientView(date, new SingleTaskClientView[]{new SingleTaskClientView(newTitle, newDescription, owner, false)}),  
+							taskManagementService.saveTaskList( new TaskListClientView(ResolutionUtils.convertDateToKey(date),
+									new SingleTaskClientView[]{new SingleTaskClientView(newTitle, newDescription, owner, false)}),  
 									new AsyncCallback<Void>() {
 
 										@Override
